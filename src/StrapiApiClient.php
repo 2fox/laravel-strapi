@@ -20,10 +20,13 @@ class StrapiApiClient
             throw new \Exception('Strapi base URL is not set in the config file.');
         }
 
-        $this->headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ];
+        $this->headers = array_merge(
+            [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+            config('laravel-strapi.headers', [])
+        );
     }
 
     /**
