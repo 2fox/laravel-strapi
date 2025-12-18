@@ -44,6 +44,16 @@ class StrapiQueryBuilder
 
     public function get()
     {
+        $locale = $this->queryParams['locale'] ?? null;
+
+        if (!$locale && config('laravel-strapi.locale.use_website_locale')) {
+            $locale = app()->getLocale();
+        }
+
+        if ($locale) {
+            $this->queryParams['locale'] = config("laravel-strapi.locale.aliases.$locale", $locale);
+        }
+        
         $response = $this->apiClient->get($this->endpoint, $this->queryParams);
 
         // If data is an array (SingleType), return a single model instance
