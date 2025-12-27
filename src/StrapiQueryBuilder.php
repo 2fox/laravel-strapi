@@ -28,9 +28,16 @@ class StrapiQueryBuilder
         }
     }
 
-    public function where(string $field, string $value): static
+    public function filters(array $filters): static
     {
-        $this->queryParams['filters'][$field]['$eq'] = $value;
+        $this->queryParams['filters'] = array_merge($this->queryParams['filters'] ?? [], $filters);
+
+        return $this;
+    }
+
+    public function where(string $field, string $value, $operator = '$eq'): static
+    {
+        $this->queryParams['filters'][$field][$operator] = $value;
 
         return $this;
     }
@@ -73,6 +80,13 @@ class StrapiQueryBuilder
     public function locale(string $locale): static
     {
         $this->queryParams['locale'] = $locale;
+
+        return $this;
+    }
+
+    public function fields($fields): static
+    {
+        $this->queryParams['fields'] = $fields;
 
         return $this;
     }
