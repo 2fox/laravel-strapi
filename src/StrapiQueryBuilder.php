@@ -84,19 +84,23 @@ class StrapiQueryBuilder
         return $this;
     }
 
-    public function fields($fields): static
+    public function fields($fields = '*'): static
     {
         $this->queryParams['fields'] = $fields;
 
         return $this;
     }
 
-    public function populate(array $populate): static
+    public function populate($populate = '*'): static
     {
-        foreach ($populate as $key => $value) {
-            $this->queryParams['populate'][$key] = $value;
+        if (is_array($populate)){
+            foreach ($populate as $key => $value) {
+                $this->queryParams['populate'][$key] = $value;
+            }
+        } else {
+            $this->queryParams['populate'] = $populate;
         }
-
+        
         return $this;
     }
 
