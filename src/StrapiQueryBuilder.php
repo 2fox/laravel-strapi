@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 use Illuminate\Container\Container;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class StrapiQueryBuilder
 {
@@ -82,7 +82,7 @@ class StrapiQueryBuilder
 
         $response = $this->apiClient->get($this->endpoint, $this->queryParams);
 
-        return Container::getInstance()->makeWith(Paginator::class, [
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
             'items'       => collect($response->data->map(fn ($attributes) => new $this->modelClass($attributes))),
             'total'       => $response->meta['pagination']['total'],
             'perPage'     => $response->meta['pagination']['pageSize'],
