@@ -34,6 +34,16 @@ class StrapiApiClient
      */
     public function get(string $endpoint, array $queryParams = []): StrapiResponse
     {
+        $locale = $queryParams['locale'] ?? null;
+
+        if (!$locale && config('laravel-strapi.locale.use_website_locale')) {
+            $locale = app()->getLocale();
+        }
+
+        if ($locale) {
+            $queryParams['locale'] = config("laravel-strapi.locale.aliases.$locale", $locale);
+        }
+        
         // Check if caching is enabled in config
         if (config('laravel-strapi.caching.active')) {
             $cacheKey = $this->generateCacheKey($endpoint, $queryParams);
