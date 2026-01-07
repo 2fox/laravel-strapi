@@ -13,7 +13,11 @@ class StrapiQueryBuilder
 {
     protected string $endpoint;
 
-    protected array $queryParams = [];
+    protected array $queryParams = [
+        'filters' => [],
+        'pagination' => [],
+        'sort' => [],
+    ];
 
     protected StrapiApiClient $apiClient;
 
@@ -48,6 +52,13 @@ class StrapiQueryBuilder
     public function limit(int $limit): static
     {
         $this->queryParams['pagination']['limit'] = $limit;
+
+        return $this;
+    }
+
+    public function orderBy(string $field, string $direction = 'asc'): static
+    {
+        $this->queryParams['sort'][] = implode(':', [$field, $direction]);
 
         return $this;
     }
