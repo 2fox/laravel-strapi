@@ -6,6 +6,9 @@ use AwStudio\LaravelStrapi\Models\StrapiModel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+use Illuminate\Container\Container;
+use Illuminate\Pagination\Paginator;
+
 class StrapiQueryBuilder
 {
     protected string $endpoint;
@@ -49,18 +52,24 @@ class StrapiQueryBuilder
         return $this;
     }
 
+    public function paginate($per_page = null)
+    {
+        if ($per_page) {
+            $this->limit($per_page);
+        }
+
+        $response = $this->apiClient->get($this->endpoint, $this->queryParams);
+
+        return Container::getInstance()->makeWith(Paginator::class, [
+            'items'       => collect($response->data->map(fn ($attributes) => new $this->modelClass($attributes))),
+            'total'       => $response->meta['pagination']['total'],
+            'perPage'     => $response->meta['pagination']['pageSize'],
+            'currentPage' => $response->meta['pagination']['page'],
+        ]);
+    }
+
     public function get()
     {
-        $locale = $this->queryParams['locale'] ?? null;
-
-        if (!$locale && config('laravel-strapi.locale.use_website_locale')) {
-            $locale = app()->getLocale();
-        }
-
-        if ($locale) {
-            $this->queryParams['locale'] = config("laravel-strapi.locale.aliases.$locale", $locale);
-        }
-        
         $response = $this->apiClient->get($this->endpoint, $this->queryParams);
 
         // If data is an array (SingleType), return a single model instance
