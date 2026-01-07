@@ -63,10 +63,21 @@ class StrapiQueryBuilder
         return $this;
     }
 
-    public function paginate($per_page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
-        if ($per_page) {
-            $this->limit($per_page);
+        $page    = $page ?: Paginator::resolveCurrentPage($pageName);
+        $perPage = value($perPage, $total) ?? 15;
+
+        if ($columns) {
+            $this->queryParams['fields'] = $columns;
+        }
+
+        if ($perPage) {
+            $this->queryParams['pagination']['pageSize'] = $perPage;
+        }
+
+        if ($page) {
+            $this->queryParams['pagination']['page'] = $page;
         }
 
         $response = $this->apiClient->get($this->endpoint, $this->queryParams);
@@ -76,6 +87,10 @@ class StrapiQueryBuilder
             'total'       => $response->meta['pagination']['total'],
             'perPage'     => $response->meta['pagination']['pageSize'],
             'currentPage' => $response->meta['pagination']['page'],
+            'options'     => [
+                'path'     => Paginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ]
         ]);
     }
 
